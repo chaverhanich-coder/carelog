@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Rabbi\'s Care Log</string>
+    <string name="offline_title">No connection</string>
+    <string name="offline_body">This app needs a connection the first time it opens. Check your Wi-Fi or mobile data, then tap Retry.</string>
+    <string name="offline_retry">Retry</string>
+    <string name="chooser_title">Add a photo</string>
+</resources>

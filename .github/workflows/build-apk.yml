@@ -1,0 +1,60 @@
+name: Build Care Log APK
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'dist/**'
+      - '**/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build debug APK
+        working-directory: android-shell
+        run: gradle --no-daemon assembleDebug
+
+      - name: Copy APK into dist
+        run: |
+          mkdir -p dist
+          cp android-shell/app/build/outputs/apk/debug/app-debug.apk dist/rabbis-care-log.apk
+          ls -l dist
+
+      - name: Save APK as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rabbis-care-log-debug-apk
+          path: dist/rabbis-care-log.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Commit APK back to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist/rabbis-care-log.apk
+          if git diff --cached --quiet; then
+            echo "APK unchanged, nothing to commit"
+          else
+            git commit -m "Update Rabbi's Care Log APK [skip ci]"
+            git push
+          fi
